@@ -26,6 +26,9 @@ public final class Constants {
 
     public static int defaultCompressorTargetLimit = 40; //in PSI
 
+    public static double solenoidOpenModeTime = 0.25; 
+    //amount of time in seconds that solenoid remains open before automatically closing
+
     // Encoder stuffs
     public static double driveGearing = 1.0/60.0;
 

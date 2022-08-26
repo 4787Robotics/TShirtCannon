@@ -24,13 +24,15 @@ public class Shooter extends SubsystemBase {
   TalonSRX fireSolenoid; // we're powering the solenoid with a motor controller since it needs more power than the PCM can give
   
 
-  private final Compressor pcmCompressor = new Compressor(Constants.CompressorID, PneumaticsModuleType.CTREPCM);
+  //private final Compressor pcmCompressor = new Compressor(Constants.CompressorID, PneumaticsModuleType.CTREPCM);
+
   public AnalogPotentiometer analog_pressure_sensor;
 
   private XboxController xbox;
 
-  private WaitCommand wait = new WaitCommand(0.1); //25 milliseconds
-  //^^^ name is misleading, its more like a timer, and you call isFinished to see if it's done
+  private WaitCommand wait = new WaitCommand(0.1); 
+  //^^^ name is misleading, it does not pause program, but rather,
+  // its more like a timer, and you call isFinished to see if it's done
 
   public int target_pressure = 30;
 
@@ -44,14 +46,12 @@ public class Shooter extends SubsystemBase {
     fireSolenoid.configPeakCurrentLimit(2); // so we don't kill the $900 solenoid :)
     fireSolenoid.enableCurrentLimit(true); // config stuff like this varies between motor controllers like Spark Max and Talons, double check documentation ig
     
-    CompressorOff(); //so compressor doesn't automatically start
+    //CompressorOff(); //so compressor doesn't automatically start
 
     xbox = RobotContainer.controller;
 
     analog_pressure_sensor = new AnalogPotentiometer(0, 250, -25);
 
-    //fireSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
-    //pcmCompressor.enableDigital();
     System.out.println("compressor initialized");
   }
   
@@ -59,19 +59,22 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     super.periodic();
 
-    if(xbox.getAButton()) {
-      CompressorOn();
-      ready = false;
-    }
-    if(xbox.getBButton()) {
-      CompressorOff();
-    }
+    
 
     if(xbox.getXButton()) {
       fire();
     }
     if(xbox.getYButton()) {
       closeSolenoid();
+    }
+
+    /*
+    if(xbox.getAButton()) {
+      CompressorOn();
+      ready = false;
+    }
+    if(xbox.getBButton()) {
+      CompressorOff();
     }
 
     if (xbox.getLeftBumperPressed()) {
@@ -86,8 +89,11 @@ public class Shooter extends SubsystemBase {
         ready = true; //ready to fire!
       }
     }
-
     SmartDashboard.putNumber("Target Pressure", target_pressure);
+    */
+    
+
+   
     SmartDashboard.putNumber("Air Pressure Reading", airPressureReading());
   }
 
@@ -123,6 +129,7 @@ public class Shooter extends SubsystemBase {
     fireSolenoid.set(TalonSRXControlMode.PercentOutput, 0.0); // 1.0 and 0.0 opens and closes the solenoid respectively
   }
 
+  /*
   public boolean CompressorStatus() {
     return pcmCompressor.enabled();
   }
@@ -133,6 +140,7 @@ public class Shooter extends SubsystemBase {
   public void CompressorOff() {
     pcmCompressor.disable();
   }
+  */
 
   /**
    * Calculates the required velocity to launch a projectile a given distance.
