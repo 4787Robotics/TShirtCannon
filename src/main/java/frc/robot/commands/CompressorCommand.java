@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Controller;
 import frc.robot.subsystems.Compressor;
 import frc.robot.Constants;
 

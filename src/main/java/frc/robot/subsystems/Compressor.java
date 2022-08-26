@@ -9,7 +9,7 @@ public class Compressor extends SubsystemBase {
 
     public Compressor() {
         compressor = new TalonSRX(5);
-        compressor.configPeakCurrentLimit(23); // so we don't kill the $900 solenoid :)
+        compressor.configPeakCurrentLimit(23); // so we don't kill the expensive compressor :)
         compressor.enableVoltageCompensation(true);
         compressor.enableCurrentLimit(true);
     }
