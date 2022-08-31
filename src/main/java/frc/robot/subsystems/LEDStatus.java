@@ -16,21 +16,9 @@ public class LEDStatus extends SubsystemBase {
     private tshirtLEDObject leds = new tshirtLEDObject();
     
     //below gives a pattern of four maroon leds, then four light gray ones, then four maroon, and so on
-    Color[] alternating_pattern = {
-        Color.kMaroon,
-        Color.kMaroon, 
-        Color.kMaroon, 
-        Color.kMaroon, 
-        Color.kLightGray, 
-        Color.kLightGray, 
-        Color.kLightGray, 
-        Color.kLightGray
-    }; 
+    Color[] alternating_pattern = {Color.kMaroon, Color.kMaroon, Color.kMaroon, Color.kMaroon, Color.kLightGray, Color.kLightGray, Color.kLightGray, Color.kLightGray}; 
     
-    Color[] chase_colors = {
-        Color.kMaroon, 
-        Color.kBlue
-    };
+    Color[] chase_colors = {Color.kMaroon, Color.kBlue};
 
     Color[] chaos_colors = {Color.kMaroon, Color.kBlue, Color.kBlack};
 

@@ -22,12 +22,9 @@ public final class Constants {
     //since solenoid is takes 2 amps 12 volts, and pcm can only provide 500ma 12 volts,
     //we need to use a motor controller to control the solenoid
 
-    public static int CompressorID = 9;
+    public static int CompressorID = 4;
 
     public static int defaultCompressorTargetLimit = 40; //in PSI
-
-    public static double solenoidOpenModeTime = 0.25; 
-    //amount of time in seconds that solenoid remains open before automatically closing
 
     // Encoder stuffs
     public static double driveGearing = 1.0/60.0;
