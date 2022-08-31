@@ -7,10 +7,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Compressor;
+//import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.Controller;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+//import frc.robot.commands.CompressorCommand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -25,33 +27,38 @@ public class Shooter extends SubsystemBase {
   
 
   //private final Compressor pcmCompressor = new Compressor(Constants.CompressorID, PneumaticsModuleType.CTREPCM);
-
+  
   public AnalogPotentiometer analog_pressure_sensor;
 
   private XboxController xbox;
+  private final Compressor compressor = new Compressor();
 
-  private WaitCommand wait = new WaitCommand(0.1); 
-  //^^^ name is misleading, it does not pause program, but rather,
-  // its more like a timer, and you call isFinished to see if it's done
+  private WaitCommand wait = new WaitCommand(1); //25 milliseconds
+  //^^^ name is misleading, its more like a timer, and you call isFinished to see if it's done
 
-  public int target_pressure = 30;
+  public int target_pressure = 18;
+  public int target_pressure_hard_limit = 190;
 
   public boolean ready = false;
+  public boolean compressor_status = false;
  
   public Shooter() {
 
     super();
 
-    fireSolenoid = new TalonSRX(5);
-    fireSolenoid.configPeakCurrentLimit(2); // so we don't kill the $900 solenoid :)
+    fireSolenoid = new TalonSRX(4);
+    fireSolenoid.configPeakCurrentLimit(1); // so we don't kill the $900 solenoid :)
+    fireSolenoid.configContinuousCurrentLimit(1);
     fireSolenoid.enableCurrentLimit(true); // config stuff like this varies between motor controllers like Spark Max and Talons, double check documentation ig
     
-    //CompressorOff(); //so compressor doesn't automatically start
+    CompressorOff(); //so compressor doesn't automatically start
 
     xbox = RobotContainer.controller;
 
-    analog_pressure_sensor = new AnalogPotentiometer(0, 250, -25);
+    analog_pressure_sensor = new AnalogPotentiometer(1, 250, -25);
 
+    //fireSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+    //pcmCompressor.enableDigital();
     System.out.println("compressor initialized");
   }
   
@@ -59,42 +66,63 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     super.periodic();
 
-    
+    if(xbox.getAButton()) {
+      compressor_status = true;
+    }
+    if(xbox.getBButton()) {
+      compressor_status = false;
+    }
 
     if(xbox.getXButton()) {
       fire();
     }
     if(xbox.getYButton()) {
-      closeSolenoid();
+      closeSolenoid();  
     }
 
-    /*
-    if(xbox.getAButton()) {
+    if (compressor_status) {
       CompressorOn();
-      ready = false;
-    }
-    if(xbox.getBButton()) {
+    } else {
       CompressorOff();
     }
 
-    if (xbox.getLeftBumperPressed()) {
-      target_pressure += 5;
+    if (xbox.getPOV() == 90) {
+      if (target_pressure <= target_pressure_hard_limit) {
+        target_pressure += 5;
+      }
+      System.out.println(target_pressure);
     }
-    if (xbox.getRightBumperPressed()) {
-      target_pressure -= 5;
+    if (xbox.getPOV() == 270) {
+      if (target_pressure >= 5) {
+        target_pressure -= 5;
+      }
+      System.out.println(target_pressure);
     }
+
+    if (xbox.getStartButtonPressed()) {
+      if (target_pressure <= target_pressure_hard_limit) {
+        target_pressure += 1;
+      }
+      System.out.println(target_pressure);
+    }
+    if (xbox.getBackButtonPressed()) {
+      if (target_pressure >= 1) {
+        target_pressure -= 1;
+      }
+      System.out.println(target_pressure);
+    }
+
     if(target_pressure <= airPressureReading()) {
+      compressor_status = false;
       CompressorOff();
       if(!overTargetPressure()) {
         ready = true; //ready to fire!
       }
     }
-    SmartDashboard.putNumber("Target Pressure", target_pressure);
-    */
-    
 
-   
+    SmartDashboard.putNumber("Target Pressure", target_pressure);
     SmartDashboard.putNumber("Air Pressure Reading", airPressureReading());
+    
   }
 
   public double airPressureReading() {
@@ -129,18 +157,16 @@ public class Shooter extends SubsystemBase {
     fireSolenoid.set(TalonSRXControlMode.PercentOutput, 0.0); // 1.0 and 0.0 opens and closes the solenoid respectively
   }
 
-  /*
   public boolean CompressorStatus() {
-    return pcmCompressor.enabled();
+    return compressor.CompressorStatus();
   }
 
   public void CompressorOn() {
-    pcmCompressor.enableDigital();
+    compressor.CompressorOn();
   }
   public void CompressorOff() {
-    pcmCompressor.disable();
+    compressor.CompressorOff();
   }
-  */
 
   /**
    * Calculates the required velocity to launch a projectile a given distance.
